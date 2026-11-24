@@ -15,7 +15,10 @@
         <div class="mb-3">
             <label class="form-label">Парола</label>
             <input type="password" th:field="*{password}" class="form-control">
-            <small class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+            <div class="form-text text-muted">
+                Изисквания: минимум 8 символа, поне 1 главна буква, 1 малка буква, 1 цифра и 1 специален символ (напр. <code>Pass123!</code>).
+            </div>
+            <small class="text-danger d-block" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
         </div>
         <button type="submit" class="btn btn-primary w-100">Регистрирай се</button>
     </form>

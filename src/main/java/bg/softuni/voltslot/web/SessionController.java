@@ -33,14 +33,18 @@ public class SessionController {
     }
 
     @GetMapping
-    public String mySessions(HttpSession session, Model model) {
+    public String mySessions(@RequestParam(required = false) UUID stationId, HttpSession session, Model model) {
         UUID userId = (UUID) session.getAttribute("user_id");
         if (userId == null) return "redirect:/login";
 
         model.addAttribute("sessions", sessionService.getUserSessions(userId));
         model.addAttribute("stations", stationService.findAll());
         if (!model.containsAttribute("bookingDto")) {
-            model.addAttribute("bookingDto", new BookingDto());
+            BookingDto dto = new BookingDto();
+            if (stationId != null) {
+                dto.setStationId(stationId);
+            }
+            model.addAttribute("bookingDto", dto);
         }
         return "sessions";
     }

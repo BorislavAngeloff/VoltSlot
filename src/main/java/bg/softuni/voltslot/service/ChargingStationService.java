@@ -64,4 +64,10 @@ public class ChargingStationService {
         }
         stationRepository.delete(station);
     }
+
+    public void toggleStatus(UUID id) {
+        ChargingStation station = findById(id);
+        station.setAvailable(!station.isAvailable());
+        stationRepository.save(station);
+    }
 }

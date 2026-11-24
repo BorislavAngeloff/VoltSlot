@@ -8,19 +8,27 @@
         <h1>Бързо EV зареждане с ANPR разпознаване</h1>
         <p class="lead">Резервирай слот онлайн само по регистрационен номер. Камерата разпознава автомобила ти 15 минути преди слота.</p>
         <a th:if="${!loggedIn}" href="/register" class="btn btn-info fw-bold">Започни сега</a>
-        <a th:if="${loggedIn}" href="/sessions" class="btn btn-info fw-bold">Резервирай слот</a>
+        <a th:if="${loggedIn}" href="/sessions" class="btn btn-info fw-bold">Моите резервации и ANPR</a>
     </div>
     <h3>Налични зарядни станции</h3>
     <div class="row g-3 mt-1">
         <div class="col-md-4" th:each="s : ${stations}">
-            <div class="card shadow-sm">
-                <div class="card-body">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
                     <h5 class="card-title" th:text="${s.name}">Станция</h5>
-                    <p class="text-muted mb-1" th:text="${s.location}">Локация</p>
-                    <span class="badge bg-primary" th:text="${s.chargerType}">DC</span>
-                    <span class="badge bg-success" th:if="${s.available}">Свободна</span>
-                    <span class="badge bg-danger" th:if="${!s.available}">Заета</span>
-                    <p class="mt-2 fw-bold" th:text="${s.pricePerKwh} + ' EUR / kWh'">0.40 EUR</p>
+                    <p class="text-muted mb-2" th:text="${s.location}">Локация</p>
+                    <div class="mb-2">
+                        <span class="badge bg-primary" th:text="${s.chargerType}">DC</span>
+                        <span class="badge bg-success" th:if="${s.available}">Свободна</span>
+                        <span class="badge bg-danger" th:if="${!s.available}">Заета</span>
+                    </div>
+                    <p class="fw-bold mb-3" th:text="${s.pricePerKwh} + ' EUR / kWh'">0.40 EUR</p>
+                    <div class="mt-auto">
+                        <a th:if="${s.available}" th:href="@{/sessions(stationId=${s.id})}" class="btn btn-outline-primary w-100 fw-semibold">
+                            Резервирай слот
+                        </a>
+                        <button th:if="${!s.available}" class="btn btn-secondary w-100" disabled>Заета в момента</button>
+                    </div>
                 </div>
             </div>
         </div>

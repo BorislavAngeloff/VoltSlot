@@ -44,6 +44,13 @@ public class StationController {
         }
         stationService.create(stationDto.getName(), stationDto.getLocation(), stationDto.getChargerType(), stationDto.getPricePerKwh());
         return "redirect:/stations";
+
+    }
+    @PostMapping("/toggle/{id}")
+    public String toggleStationStatus(@PathVariable UUID id, HttpSession session) {
+        if (!isAdmin(session)) throw new DomainRuleViolationException("Само администратор може да променя статуса!");
+        stationService.toggleStatus(id);
+        return "redirect:/stations";
     }
 
     @GetMapping("/edit/{id}")

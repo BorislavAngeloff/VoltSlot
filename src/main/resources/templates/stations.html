@@ -31,7 +31,7 @@
         </form>
     </div>
 
-    <table class="table table-bordered bg-white shadow-sm">
+    <table class="table table-bordered bg-white shadow-sm align-middle">
         <thead>
         <tr>
             <th>Име</th>
@@ -39,7 +39,8 @@
             <th>Тип</th>
             <th>Цена (EUR/kWh)</th>
             <th>Статус</th>
-            <th th:if="${session.role == 'ADMIN'}">Действия (CRUD)</th>
+            <th>Резервация</th>
+            <th th:if="${session.role == 'ADMIN'}">Admin CRUD</th>
         </tr>
         </thead>
         <tbody>
@@ -48,8 +49,20 @@
             <td th:text="${s.location}"></td>
             <td th:text="${s.chargerType}"></td>
             <td th:text="${s.pricePerKwh}"></td>
-            <td th:text="${s.available ? 'Свободна' : 'Заета'}"></td>
+            <td>
+                <span class="badge bg-success" th:if="${s.available}">Свободна</span>
+                <span class="badge bg-danger" th:if="${!s.available}">Заета</span>
+            </td>
+            <td>
+                <a th:if="${s.available}" th:href="@{/sessions(stationId=${s.id})}" class="btn btn-sm btn-primary">
+                    Избери и резервирай
+                </a>
+                <button th:if="${!s.available}" class="btn btn-sm btn-secondary" disabled>Недостъпна</button>
+            </td>
             <td th:if="${session.role == 'ADMIN'}" class="d-flex gap-2">
+                <form th:action="@{/stations/toggle/{id}(id=${s.id})}" method="post">
+                    <button type="submit" class="btn btn-sm btn-outline-dark">Смени статус</button>
+                </form>
                 <a th:href="@{/stations/edit/{id}(id=${s.id})}" class="btn btn-sm btn-warning">Редактирай</a>
                 <form th:action="@{/stations/delete/{id}(id=${s.id})}" method="post">
                     <button type="submit" class="btn btn-sm btn-danger">Изтрий</button>
