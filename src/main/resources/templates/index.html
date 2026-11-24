@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('VoltSlot - Начало')}"></head>
+<body class="bg-light">
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container">
+    <div class="p-4 mb-4 bg-dark text-white rounded-3">
+        <h1>Бързо EV зареждане с ANPR разпознаване</h1>
+        <p class="lead">Резервирай слот онлайн само по регистрационен номер. Камерата разпознава автомобила ти 15 минути преди слота.</p>
+        <a th:if="${!loggedIn}" href="/register" class="btn btn-info fw-bold">Започни сега</a>
+        <a th:if="${loggedIn}" href="/sessions" class="btn btn-info fw-bold">Резервирай слот</a>
+    </div>
+    <h3>Налични зарядни станции</h3>
+    <div class="row g-3 mt-1">
+        <div class="col-md-4" th:each="s : ${stations}">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${s.name}">Станция</h5>
+                    <p class="text-muted mb-1" th:text="${s.location}">Локация</p>
+                    <span class="badge bg-primary" th:text="${s.chargerType}">DC</span>
+                    <span class="badge bg-success" th:if="${s.available}">Свободна</span>
+                    <span class="badge bg-danger" th:if="${!s.available}">Заета</span>
+                    <p class="mt-2 fw-bold" th:text="${s.pricePerKwh} + ' EUR / kWh'">0.40 EUR</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

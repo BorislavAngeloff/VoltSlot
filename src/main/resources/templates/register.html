@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Регистрация')}"></head>
+<body class="bg-light">
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container col-md-5">
+    <h3>Регистрация</h3>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    <form th:action="@{/register}" th:object="${userDto}" method="post" class="card p-4 shadow-sm">
+        <div class="mb-3">
+            <label class="form-label">Потребителско име</label>
+            <input type="text" th:field="*{username}" class="form-control">
+            <small class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></small>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Парола</label>
+            <input type="password" th:field="*{password}" class="form-control">
+            <small class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Регистрирай се</button>
+    </form>
+</div>
+</body>
+</html>
