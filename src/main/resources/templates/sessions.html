@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Резервации и ANPR')}"></head>
+<body class="bg-light">
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container">
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <div class="card p-4 mb-4 shadow-sm">
+        <h4>Резервирай слот и плати онлайн</h4>
+        <form th:action="@{/sessions/book}" th:object="${bookingDto}" method="post" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Зарядна станция</label>
+                <select th:field="*{stationId}" class="form-select">
+                    <option th:each="s : ${stations}" th:if="${s.available}" th:value="${s.id}"
+                            th:text="${s.name} + ' (' + ${s.pricePerKwh} + ' EUR/kWh)'"></option>
+                </select>
+                <small class="text-danger" th:if="${#fields.hasErrors('stationId')}" th:errors="*{stationId}"></small>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Регистрационен номер</label>
+                <input type="text" th:field="*{licensePlate}" placeholder="CB1234AB" class="form-control">
+                <small class="text-danger" th:if="${#fields.hasErrors('licensePlate')}" th:errors="*{licensePlate}"></small>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Начало на слота</label>
+                <input type="datetime-local" th:field="*{slotStartTime}" class="form-control">
+                <small class="text-danger" th:if="${#fields.hasErrors('slotStartTime')}" th:errors="*{slotStartTime}"></small>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Време (мин.)</label>
+                <input type="number" th:field="*{durationMinutes}" class="form-control">
+                <small class="text-danger" th:if="${#fields.hasErrors('durationMinutes')}" th:errors="*{durationMinutes}"></small>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Плати</button>
+            </div>
+        </form>
+    </div>
+
+    <h4>Моите зарядни сесии и ANPR контрол</h4>
+    <div class="row g-3">
+        <div class="col-md-6" th:each="sess : ${sessions}">
+            <div class="card p-3 shadow-sm">
+                <div class="d-flex justify-content-between">
+                    <h5 th:text="${sess.station.name}">Станция</h5>
+                    <span class="badge bg-info text-dark" th:text="${sess.status}">RESERVED</span>
+                </div>
+                <p class="mb-1"><strong>Номер:</strong> <span th:text="${sess.licensePlate}"></span> | <strong>Час:</strong> <span th:text="${sess.slotStartTime}"></span></p>
+                <p class="mb-2"><strong>Платено:</strong> <span th:text="${sess.totalPaidEur}"></span> EUR | <strong class="text-danger">Неустойки: <span th:text="${sess.penaltyEur}"></span> EUR</strong></p>
+
+                <div class="progress mb-3" style="height: 22px;">
+                    <div class="progress-bar bg-success" role="progressbar"
+                         th:style="'width: ' + ${sess.batteryPercentage} + '%'"
+                         th:text="'Батерия: ' + ${sess.batteryPercentage} + '%'"></div>
+                </div>
+
+                <div th:if="${sess.status.name() == 'RESERVED'}" class="d-flex gap-2">
+                    <form th:action="@{/sessions/{id}/anpr(id=${sess.id})}" method="post" class="d-flex gap-1 flex-grow-1">
+                        <input type="text" name="detectedPlate" placeholder="ANPR камера номер..." class="form-control form-control-sm" required>
+                        <button type="submit" class="btn btn-sm btn-success">ANPR Старт</button>
+                    </form>
+                    <form th:action="@{/sessions/{id}/no-show(id=${sess.id})}" method="post">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Закъснение >15м (-5 EUR)</button>
+                    </form>
+                </div>
+
+                <div th:if="${sess.status.name() == 'ACTIVE_CHARGING'}" class="d-flex gap-2">
+                    <form th:action="@{/sessions/{id}/finish(id=${sess.id})}" method="post">
+                        <button type="submit" class="btn btn-sm btn-primary">Освободи навреме (100%)</button>
+                    </form>
+                    <form th:action="@{/sessions/{id}/finish(id=${sess.id})}" method="post">
+                        <input type="hidden" name="overstayed" value="true">
+                        <button type="submit" class="btn btn-sm btn-danger">Просрочване >15м (-5 EUR)</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

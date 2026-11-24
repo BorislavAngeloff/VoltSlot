@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Зарядни станции')}"></head>
+<body class="bg-light">
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container">
+    <h3>Зарядни станции</h3>
+    <div th:if="${session.role == 'ADMIN'}" class="card p-3 mb-4 shadow-sm">
+        <h5>Добави нова станция (Admin)</h5>
+        <form th:action="@{/stations/add}" th:object="${stationDto}" method="post" class="row g-2">
+            <div class="col-md-3">
+                <input type="text" th:field="*{name}" placeholder="Име" class="form-control">
+                <small class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+            </div>
+            <div class="col-md-3">
+                <input type="text" th:field="*{location}" placeholder="Локация" class="form-control">
+                <small class="text-danger" th:if="${#fields.hasErrors('location')}" th:errors="*{location}"></small>
+            </div>
+            <div class="col-md-2">
+                <select th:field="*{chargerType}" class="form-select">
+                    <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="number" step="0.01" th:field="*{pricePerKwh}" placeholder="EUR/kWh" class="form-control">
+                <small class="text-danger" th:if="${#fields.hasErrors('pricePerKwh')}" th:errors="*{pricePerKwh}"></small>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Добави</button>
+            </div>
+        </form>
+    </div>
+
+    <table class="table table-bordered bg-white shadow-sm">
+        <thead>
+        <tr>
+            <th>Име</th>
+            <th>Локация</th>
+            <th>Тип</th>
+            <th>Цена (EUR/kWh)</th>
+            <th>Статус</th>
+            <th th:if="${session.role == 'ADMIN'}">Действия (CRUD)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${stations}">
+            <td th:text="${s.name}"></td>
+            <td th:text="${s.location}"></td>
+            <td th:text="${s.chargerType}"></td>
+            <td th:text="${s.pricePerKwh}"></td>
+            <td th:text="${s.available ? 'Свободна' : 'Заета'}"></td>
+            <td th:if="${session.role == 'ADMIN'}" class="d-flex gap-2">
+                <a th:href="@{/stations/edit/{id}(id=${s.id})}" class="btn btn-sm btn-warning">Редактирай</a>
+                <form th:action="@{/stations/delete/{id}(id=${s.id})}" method="post">
+                    <button type="submit" class="btn btn-sm btn-danger">Изтрий</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
